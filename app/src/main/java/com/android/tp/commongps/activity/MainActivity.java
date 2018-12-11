@@ -8,18 +8,13 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.android.tp.commongps.R;
 import com.android.tp.commongps.core.FirebaseManager;
 import com.android.tp.commongps.fragments.FriendsFragment;
 import com.android.tp.commongps.fragments.MyMapFragment;
-import com.android.tp.commongps.models.Friend;
-import com.android.tp.commongps.models.User;
-
-import java.util.ArrayList;
-import java.util.List;
-
 
 public class MainActivity extends AppCompatActivity {
     private int currentMenuId = 0;
@@ -63,18 +58,19 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // VK initialization
-        Intent vkLoginIntent = new Intent(this, VkLoginActivity.class);
-        startActivity(vkLoginIntent);
+        openVkActivity();
 
         setContentView(R.layout.activity_main);
-
         FirebaseManager.getInstance();
-
         renderMap();
 
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+    }
+
+    public void openVkActivity() {
+        Intent vkLoginIntent = new Intent(this, VkLoginActivity.class);
+        startActivity(vkLoginIntent);
     }
 
     public void renderMap() {

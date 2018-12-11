@@ -89,7 +89,7 @@ public class FriendsFragmentListAdapter extends BaseExpandableListAdapter {
             //Изменяем что-нибудь, если текущая Group скрыта
         }
 
-        TextView textGroup = (TextView) convertView.findViewById(R.id.textGroup);
+        TextView textGroup = (TextView) convertView.findViewById(R.id.username);
         String FIO = friendsList.get(groupPosition).getFirstName() + " " + friendsList.get(groupPosition).getLastName();
         textGroup.setText(FIO);
 
@@ -104,7 +104,7 @@ public class FriendsFragmentListAdapter extends BaseExpandableListAdapter {
             convertView = inflater.inflate(R.layout.child_view, null);
         }
 
-        TextView textChild = (TextView) convertView.findViewById(R.id.textChild);
+        TextView textChild = (TextView) convertView.findViewById(R.id.about_text);
 
         String textChildStr = "";
         if(friendsList.get(groupPosition).isOnline()) {
@@ -119,7 +119,7 @@ public class FriendsFragmentListAdapter extends BaseExpandableListAdapter {
 
         textChild.setText(textChildStr);
 
-        Button button = (Button)convertView.findViewById(R.id.buttonChild);
+        Button button = (Button)convertView.findViewById(R.id.send_message);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

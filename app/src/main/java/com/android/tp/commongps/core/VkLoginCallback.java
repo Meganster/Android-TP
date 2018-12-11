@@ -50,8 +50,6 @@ public class VkLoginCallback<VKAccessToken> implements VKCallback<VKAccessToken>
                     for (int i = 0; i < friends.length(); i++) {
                         friendsIdList.add(friends.getJSONObject(i).getInt("id"));
 
-//                        Log.i("VK_API", String.valueOf(friends.getJSONObject(i).getJSONObject("last_seen")));
-
                         long unixDate = -1;
                         try {
                             unixDate = friends.getJSONObject(i).getJSONObject("last_seen").getLong("time");

@@ -12,31 +12,32 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import com.android.tp.commongps.fragments.MyMapFragment;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 
-public class MapManager implements OnMapReadyCallback, ActivityCompat.OnRequestPermissionsResultCallback, LocationListener {
-
-    private FragmentActivity context;
+public class MapManager implements ActivityCompat.OnRequestPermissionsResultCallback, LocationListener {
+    private AppCompatActivity context;
     private GoogleMap map;
     private LocationManager locationManager;
-    private Map<Integer, Marker> markersMap;
+    private HashMap<Integer, Marker> markersMap = new HashMap<>();
+    private Boolean findMeButtonPressed = false;
 
     private static final long MIN_TIME = 1000 * 5; // 5 секунд
     private static final float MIN_DISTANCE = 0.1f;
@@ -46,18 +47,11 @@ public class MapManager implements OnMapReadyCallback, ActivityCompat.OnRequestP
     //private static final boolean FIRST_INIT_USER = true;
 
 
-    public MapManager(FragmentActivity context, MyMapFragment mapFragment) {
+    public MapManager(AppCompatActivity context, GoogleMap map) {
         this.context = context;
-        mapFragment.getMapAsync(this); // приводит к вызову onMapReady
+        this.map = map;
         locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
     }
-
-    @Override
-    public void onMapReady(GoogleMap map) {
-        this.map = map;
-        this.map.getUiSettings().setMyLocationButtonEnabled(false);
-    }
-
 
     //работа с маркерами друзей
     public void addMarker(int id, String name, long lastonline, double latitude, double longtitude) {
@@ -88,8 +82,6 @@ public class MapManager implements OnMapReadyCallback, ActivityCompat.OnRequestP
     public boolean MarkerExist(int checkingId){
        return markersMap.containsKey(checkingId);
     }
-    //
-
 
 
     /**
@@ -98,14 +90,13 @@ public class MapManager implements OnMapReadyCallback, ActivityCompat.OnRequestP
      * В противном случае ставим точку местоположения и инициализируем слушателей на измение местоположения
      *  (метод onLocationChanged)
      */
-
-    private boolean findMeButtonPressed = false;
     public void showClientLocation() {
         if (map != null && map.isMyLocationEnabled()) {
             moveCameraToTheClient(map.getMyLocation());
         } else if (checkPermission()) {
             try {
                 map.setMyLocationEnabled(true);
+                findMeButtonPressed = true;
                 locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME, MIN_DISTANCE, this);
                 locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME, MIN_DISTANCE, this);
             }
@@ -130,7 +121,7 @@ public class MapManager implements OnMapReadyCallback, ActivityCompat.OnRequestP
         CoreApplication.getClient().setPosition(location.getLatitude(), location.getLongitude(), 0D);
         FirebaseManager.getInstance().initUser(CoreApplication.getClient());
 
-        if (findMeButtonPressed) {
+        if(findMeButtonPressed) {
             moveCameraToTheClient(location);
             findMeButtonPressed = false;
         }

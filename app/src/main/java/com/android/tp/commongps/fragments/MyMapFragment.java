@@ -7,16 +7,23 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import com.android.tp.commongps.R;
+import com.android.tp.commongps.activity.MainActivity;
+import com.android.tp.commongps.core.MapManager;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 
+import java.util.Objects;
+
 
 public class MyMapFragment extends Fragment implements OnMapReadyCallback {
     MapView mapView;
+    Button findMeButton;
     GoogleMap map;
+    MapManager mapManager;
 
     public static Fragment newInstance() {
         MyMapFragment myMapFragment = new MyMapFragment();
@@ -45,9 +52,27 @@ public class MyMapFragment extends Fragment implements OnMapReadyCallback {
 
         mapView = (MapView) view.findViewById(R.id.mapview);
         mapView.onCreate(savedInstanceState);
-        mapView.getMapAsync(this);
+        mapView.getMapAsync(this); // приводит к вызову onMapReady
+        findMeButton = (Button) view.findViewById(R.id.find_me);
+
+        // при нажатии на кнопку происходит проверка включен ли GPS и карта зумится на местоположение клиента
+        findMeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mapManager.checkGps();
+                mapManager.showClientLocation();
+            }
+        });
 
         return view;
+    }
+
+    @Override
+    public void onMapReady(GoogleMap map) {
+        this.map = map;
+        this.map.getUiSettings().setMyLocationButtonEnabled(false);
+
+        mapManager = new MapManager((MainActivity) Objects.requireNonNull(getActivity()), map);
     }
 
     @Override
@@ -56,20 +81,10 @@ public class MyMapFragment extends Fragment implements OnMapReadyCallback {
         super.onResume();
     }
 
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        map = googleMap;
-        this.map.getUiSettings().setMyLocationButtonEnabled(false);
-
-//        map.getUiSettings().setMyLocationButtonEnabled(false);
-//        map.setMyLocationEnabled(true);
-//
-//        // Needs to call MapsInitializer before doing any CameraUpdateFactory calls
-//        MapsInitializer.initialize(this.getActivity());
-//
-//        // Updates the location and zoom of the MapView
-//        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(43.1, -87.9), 10);
-//        map.animateCamera(cameraUpdate);
+    public MapView getMapView() {
+        return this.mapView;
     }
-
+    public Button getFindMeButton() {
+        return this.findMeButton;
+    }
 }
